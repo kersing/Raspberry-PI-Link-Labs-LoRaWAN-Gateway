@@ -2,25 +2,29 @@
 
 Reference setup for LoRaWAN Gateway based on a Raspberry Pi host and the Link Labs [Gateway Board](http://store.link-labs.com/products/lorawan-raspberry-pi-board).
 
-## Hardware setup
+## Hardware setup for Linklabs RPI Shield
 
 [schematic](http://forum.thethingsnetwork.org/uploads/default/original/1X/dbdd7deb2b854bb7104019d79683f2d1ae9f1c51.pdf)
 
-| Description   | RPi pin
-|---------------|-----------------
-| SX1301 Reset  | 29 GPIO5 output
-| GPS Reset     | 31 GPIO6 output
-| PPS           |  7 GPIO4 input
-| SPI CLK       | 23
-| SPI MISO      | 21
-| SPI MOSI      | 19
-| SPI NSS       | 24
+GPIO Mapping for linklabs Raspberry PI Shield
+
+| Description | RPi pin | BCM GPIO | WiringPi | Mode
+| :---: | :---: | :---: | :---: | :---:
+| SX1301 Reset  | 29 | GPIO5  | 21 | output
+| GPS Reset     | 31 | GPIO6  | 22 | output
+| GPS PPS       | 7  | GPIO4  | 7  | input  
+| SPI CLK       | 23 |        |    | 
+| SPI MISO      | 21 |        |    | 
+| SPI MOSI      | 19 |        |    | 
+| SPI NSS       | 24 |        |    | 
+| LED 1         | 13 | GPIO27 | 2  | output
+| LED 2         | 22 | GPIO25 | 6  | output
 
 Now you're ready to start the software setup.
 
 ## Software setup (Raspbian)
 
-- Download [Raspbian Jessie](https://www.raspberrypi.org/downloads/)
+- Download [Raspbian Jessie Lite](https://www.raspberrypi.org/downloads/)
 - Follow the [installation instruction](https://www.raspberrypi.org/documentation/installation/installing-images/README.md) to create the SD card
 - Connect an Ethernet cable to the RPi
 - Plug the power supply of the RPi which will also power the concentrator board (**WARNING**: never power up without the antenna!)
@@ -38,7 +42,7 @@ Now you're ready to start the software setup.
         $ sudo dpkg-reconfigure locales
         $ sudo dpkg-reconfigure tzdata
 
-- Remove desktop-related packages:
+- Remove desktop-related packages (if you installed debian jessie lite skip this step):
 
         $ sudo apt-get install deborphan
         $ sudo apt-get autoremove --purge libx11-.* lxde-.* raspberrypi-artwork xkb-data omxplayer penguinspuzzle sgml-base xml-core alsa-.* cifs-.* samba-.* fonts-.* desktop-* gnome-.*
@@ -62,9 +66,17 @@ Now you're ready to start the software setup.
         $ cd ~/linklabs
         $ sudo ./install.sh
 
+- Recommended, put your Raspberry PI in Read Only mode to protect sour SD Card. Follow Charles's [blog entry](https://hallard.me/raspberry-pi-read-only/) to do it.
+
+# Led Management
+
+On linklabs Raspberry Pi board, LED 1 and LED 2 will light on as soon as service is running, then 
+- LED 1 will blink (light off for short time) if GPS satellites are acquired (even if GPS is disabled in config), in fact GPS PPS output pin is redirected to LED GPIO output pin by software.
+- LED 2 will blink (light off for short time) on each packet received.
 
 # Credits
 
 These scripts are largely based on the awesome work by [Ruud Vlaming](https://github.com/devlaam) on the [Lorank8 installer](https://github.com/Ideetron/Lorank).
 This repository has been forked from https://github.com/mirakonta/Raspberry-PI-Link-Labs-LoRaWAN-Gateway, the changes were made to use older gateway software
-required because The Things Network does not yet support the new protocol used by the newest Lora-net/packet_forwarder.
+required because The Things Network does not yet support the new protocol used by the newest Lora-net/packet_forwarder.    
+Then forked from https://github.com/kersing/Raspberry-PI-Link-Labs-LoRaWAN-Gateway, to add led support
